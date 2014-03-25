@@ -21,6 +21,10 @@ module Middleman
           # Tell Tilt to use it as well (for inline scss blocks)
           ::Tilt.register 'scss', ScssPlusCSSFilenameTemplate
           ::Tilt.prefer(ScssPlusCSSFilenameTemplate)
+
+          app.before_configuration do
+            files.watch :sass_cache, /(^|\/)\.sass-cache\//
+          end
         end
 
         alias :included :registered

@@ -3,24 +3,6 @@ module Middleman
   module CoreExtensions
     module FileWatcher
 
-      IGNORE_LIST = [
-        /^bin\//,
-        /^\.bundle\//,
-        /^vendor\//,
-        /^\.sass-cache\//,
-        /^\.cache\//,
-        /^\.git\//,
-        /^node_modules(\/|$)/,
-        /^\.gitignore$/,
-        /\.DS_Store/,
-        /^\.rbenv-.*$/,
-        /^Gemfile$/,
-        /^Gemfile\.lock$/,
-        /~$/,
-        /(^|\/)\.?#/,
-        /^tmp\//
-      ]
-
       # Setup extension
       class << self
 
@@ -31,20 +13,15 @@ module Middleman
 
           app.send :include, InstanceMethods
 
-          app.config.define_setting :file_watcher_ignore, IGNORE_LIST, 'Regexes for paths that should be ignored when they change.'
-
           # Before parsing config, load the data/ directory
           app.before_configuration do
             files.reload_path(config[:data_dir])
           end
 
-          app.after_configuration do
-            config[:file_watcher_ignore] << %r{^#{config[:build_dir]}\/}
-          end
-
           # After config, load everything else
           app.ready do
             files.reload_path('.')
+            files.is_ready = true
           end
         end
       end
@@ -64,15 +41,50 @@ module Middleman
 
         attr_reader :app
         attr_reader :known_paths
+        attr_accessor :is_ready
         delegate :logger, :to => :app
 
         # Initialize api and internal path cache
         def initialize(app)
           @app = app
           @known_paths = Set.new
+          @is_ready = false
 
-          @_changed = []
-          @_deleted = []
+          @watchers = {
+            :source  => Proc.new { |path, app| path.match(/^#{app.config[:source]}\//) },
+            :library => /^(lib|helpers)\/.*\.rb$/
+          }
+
+          @ignores = {
+            :emacs_files     => /(^|\/)\.?#/,
+            :tilde_files     => /~$/,
+            :ds_store        => /\.DS_Store\//,
+            :git             => /(^|\/)\.git(ignore|modules|\/)/
+          }
+
+          @changed = []
+          @deleted = []
+
+          @app.add_to_config_context :files, &method(:files_api)
+        end
+
+        # Expose self to config.
+        def files_api
+          self
+        end
+
+        # Add a proc to watch paths
+        def watch(name, regex=nil, &block)
+          @watchers[name] = block_given? ? block : regex
+
+          reload_path('.') if @is_ready
+        end
+
+        # Add a proc to ignore paths
+        def ignore(name, regex=nil, &block)
+          @ignores[name] = block_given? ? block : regex
+
+          reload_path('.') if @is_ready
         end
 
         # Add callback to be run on file change
@@ -80,8 +92,8 @@ module Middleman
         # @param [nil,Regexp] matcher A Regexp to match the change path against
         # @return [Array<Proc>]
         def changed(matcher=nil, &block)
-          @_changed << [block, matcher] if block_given?
-          @_changed
+          @changed << [block, matcher] if block_given?
+          @changed
         end
 
         # Add callback to be run on file deletion
@@ -89,8 +101,8 @@ module Middleman
         # @param [nil,Regexp] matcher A Regexp to match the deleted path against
         # @return [Array<Proc>]
         def deleted(matcher=nil, &block)
-          @_deleted << [block, matcher] if block_given?
-          @_deleted
+          @deleted << [block, matcher] if block_given?
+          @deleted
         end
 
         # Notify callbacks that a file changed
@@ -162,7 +174,16 @@ module Middleman
         # @return [Boolean]
         def ignored?(path)
           path = path.to_s
-          app.config[:file_watcher_ignore].any? { |r| path =~ r }
+          !(@watchers.values.any? { |validator| matches?(validator, path) } &&
+            @ignores.values.none? { |validator| matches?(validator, path) })
+        end
+
+        def matches?(validator, path)
+          if validator.is_a? Regexp
+            validator.match(path)
+          else
+            validator.call(path, @app)
+          end
         end
 
         # Notify callbacks for a file given an array of callbacks

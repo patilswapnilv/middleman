@@ -31,6 +31,11 @@ module Middleman
             self.data.remove_file(file) if file.start_with?("#{config[:data_dir]}/")
           end
 
+          # Tell the file watcher to observe the :data_dir
+          self.files.watch :data do |path, app|
+            path.match(/^#{app.config[:data_dir]}\/.*(json|yml|yaml)$/)
+          end
+
           super
         end
 
