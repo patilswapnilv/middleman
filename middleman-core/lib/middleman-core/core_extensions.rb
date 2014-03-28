@@ -29,7 +29,8 @@ require 'middleman-core/core_extensions/show_exceptions'
 # Setup default helpers
 require 'middleman-core/core_extensions/default_helpers'
 
-require 'middleman-core/core_extensions/i18n'
+require 'middleman-core/core_extensions/i18n_v3'
+require 'middleman-core/core_extensions/i18n_v4'
 
 # Compass framework
 begin

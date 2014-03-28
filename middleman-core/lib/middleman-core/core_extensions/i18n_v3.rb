@@ -1,4 +1,4 @@
-class Middleman::CoreExtensions::Internationalization < ::Middleman::Extension
+class Middleman::CoreExtensions::InternationalizationV3 < ::Middleman::Extension
   option :no_fallbacks, false, 'Disable I18n fallbacks'
   option :langs, nil, 'List of langs, will autodiscover by default'
   option :lang_map, {}, 'Language shortname map'
@@ -202,4 +202,4 @@ class Middleman::CoreExtensions::Internationalization < ::Middleman::Extension
   end
 end
 
-Middleman::CoreExtensions::Internationalization.register(:i18n)
+Middleman::CoreExtensions::InternationalizationV3.register(:i18n_v3)
