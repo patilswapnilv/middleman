@@ -197,10 +197,12 @@ module Middleman
       activate :default_helpers
       activate :lorem
 
-      begin
-        activate :compass
-      rescue LoadError
-        # Compass is not available, don't complain about it
+      if config[:autoload_compass]
+        begin
+          activate :compass
+        rescue LoadError
+          # Compass is not available, don't complain about it
+        end
       end
 
       # Evaluate a passed block if given

@@ -4,6 +4,8 @@ class Middleman::Extensions::CacheBuster < ::Middleman::Extension
   def initialize(app, options_hash={}, &block)
     super
 
+    # TODO: REQUIRES COMPASS
+
     # After compass is setup, make it use the registered cache buster
     app.compass_config do |config|
       config.asset_cache_buster do |path, real_path|

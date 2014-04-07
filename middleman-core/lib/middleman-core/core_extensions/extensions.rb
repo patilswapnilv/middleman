@@ -47,6 +47,9 @@ module Middleman
           app.config.define_setting :autoload_sprockets, true, 'Automatically load sprockets at startup?'
           app.config[:autoload_sprockets] = (ENV['AUTOLOAD_SPROCKETS'] == 'true') if ENV['AUTOLOAD_SPROCKETS']
 
+          app.config.define_setting :autoload_compass, true, 'Automatically load compass at startup?'
+          app.config[:autoload_compass] = (ENV['AUTOLOAD_COMPASS'] == 'true') if ENV['AUTOLOAD_COMPASS']
+
           app.extend ClassMethods
           app.send :include, InstanceMethods
           app.delegate :configure, :to => :"self.class"
