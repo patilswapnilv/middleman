@@ -34,4 +34,14 @@ Gem::Specification.new do |s|
 
   # i18n
   s.add_dependency('i18n', ['~> 0.6.9'])
+
+  # Minify CSS
+  s.add_dependency('sass', ['>= 3.3.4'])
+
+  # Work around Sass performance
+  s.add_dependency('compass-import-once', ['~> 1.0.4'])
+
+  # Minify JS
+  s.add_dependency('uglifier', ['~> 2.5'])
+  s.add_dependency('execjs', ['~> 2.0'])
 end

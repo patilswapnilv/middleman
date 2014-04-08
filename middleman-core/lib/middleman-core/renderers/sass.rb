@@ -12,8 +12,11 @@ module Middleman
 
         # Once registered
         def registered(app)
+          opts = {}
+          opts[:line_comments] = true if ENV['TEST']
+
           # Default sass options
-          app.config.define_setting :sass, {}, 'Sass engine options'
+          app.config.define_setting :sass, opts, 'Sass engine options'
 
           # Tell Tilt to use it as well (for inline sass blocks)
           ::Tilt.register 'sass', SassPlusCSSFilenameTemplate
@@ -24,6 +27,8 @@ module Middleman
           ::Tilt.prefer(ScssPlusCSSFilenameTemplate)
 
           ::Compass::ImportOnce.activate!
+
+          require 'middleman-core/renderers/sass_functions'
         end
 
         alias :included :registered
@@ -66,7 +71,12 @@ module Middleman
         # Change Sass path, for url functions, to the build folder if we're building
         # @return [Hash]
         def sass_options
-          more_opts = { :filename => eval_file, :line => line, :syntax => syntax }
+          more_opts = {
+            filename: eval_file,
+            line: line,
+            syntax: syntax,
+            custom: { middleman_context: @context.app }
+          }
 
           if @context.is_a?(::Middleman::TemplateContext) && file
             location_of_sass_file = @context.source_dir

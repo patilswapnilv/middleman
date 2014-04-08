@@ -24,6 +24,7 @@ Feature: Support slim templating language
     Given an empty app
     And a file named "config.rb" with:
       """
+      activate :compass
       """
     And a file named "source/scss.html.slim" with:
       """
