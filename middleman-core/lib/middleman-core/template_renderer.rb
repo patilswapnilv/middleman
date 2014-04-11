@@ -39,6 +39,7 @@ module Middleman
       # Sandboxed class for template eval
       context = @app.template_context_class.new(@app, locs, opts)
 
+      # TODO: Only for HAML files
       if context.respond_to?(:init_haml_helpers)
         context.init_haml_helpers
       end
