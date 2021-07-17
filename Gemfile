@@ -7,7 +7,7 @@ gem 'rake', '~> 13.0', require: false
 gem 'yard', '~> 0.9.26', require: false
 
 # Test tools
-gem 'addressable', '~> 2.4', require: false
+gem 'addressable', '~> 2.8', require: false
 gem 'aruba', '~> 1.0.4', require: false
 gem 'byebug'
 gem 'capybara', '~> 3.35.3', require: false
@@ -33,12 +33,12 @@ gem 'slim', '>= 2.0', require: false
 gem 'rubydns', '~> 2.0.2', require: false
 
 # For less, note there is no compatible JS runtime for windows
-gem 'mini_racer', '~> 0.3.1', platforms: :ruby
+gem 'mini_racer', '~> 0.4.0', platforms: :ruby
 gem 'therubyrhino', '>= 2.0', platforms: :jruby
 
 # Code Quality
-gem 'rubocop', '~> 1.12', require: false
-gem 'rubocop-performance', '~> 1.10', require: false
+gem 'rubocop', '~> 1.18', require: false
+gem 'rubocop-performance', '~> 1.11', require: false
 gem 'simplecov', '~> 0.21', require: false
 
 # Middleman itself
